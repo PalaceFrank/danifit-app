@@ -78,13 +78,13 @@ export function ProfileView({ profile }: ProfileViewProps) {
       {/* Avatar */}
       <Card className="flex items-center gap-4">
         <div className="w-14 h-14 bg-pink/20 rounded-full flex items-center justify-center text-pink text-xl font-bold shrink-0">
-          {profile.full_name.charAt(0).toUpperCase()}
+          {profile.full_name?.charAt(0)?.toUpperCase() ?? '?'}
         </div>
         <div className="min-w-0">
-          <p className="font-bold truncate">{profile.full_name}</p>
+          <p className="font-bold truncate">{profile.full_name || 'Sin nombre'}</p>
           <p className="text-xs text-text-muted truncate">{profile.email}</p>
           <Badge variant={profile.status === 'active' ? 'green' : profile.status === 'pending' ? 'yellow' : 'red'} className="mt-1">
-            {STATUS_LABEL[profile.status]}
+            {STATUS_LABEL[profile.status] ?? profile.status}
           </Badge>
         </div>
       </Card>

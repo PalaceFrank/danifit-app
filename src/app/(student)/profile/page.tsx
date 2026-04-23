@@ -14,10 +14,12 @@ export default async function ProfilePage() {
     .eq('id', user.id)
     .single()
 
+  if (!profile) redirect('/login')
+
   return (
     <>
       <TopBar title="Mi perfil" />
-      <ProfileView profile={profile!} />
+      <ProfileView profile={profile} />
     </>
   )
 }
