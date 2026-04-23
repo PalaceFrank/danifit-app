@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code context
+.claude/
+
+# PWA generated icons (SVG sources only, PNGs regenerated)
+public/icons/*.svg
