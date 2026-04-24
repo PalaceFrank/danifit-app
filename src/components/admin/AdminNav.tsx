@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Users, Rss, Mail, LayoutDashboard, ArrowLeftRight } from 'lucide-react'
+import { CalendarDays, Users, Rss, Mail, LayoutDashboard, ArrowLeftRight, ClipboardCheck } from 'lucide-react'
 
 const ADMIN_NAV = [
-  { href: '/admin/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/schedule',     icon: CalendarDays,    label: 'Programa' },
-  { href: '/admin/feed',         icon: Rss,             label: 'Feed' },
-  { href: '/admin/users',        icon: Users,           label: 'Alumnos' },
-  { href: '/admin/invitations',  icon: Mail,            label: 'Invitaciones' },
+  { href: '/admin/dashboard',    icon: LayoutDashboard,  label: 'Dashboard' },
+  { href: '/admin/schedule',     icon: CalendarDays,     label: 'Programa' },
+  { href: '/admin/attendance',   icon: ClipboardCheck,   label: 'Asistencia' },
+  { href: '/admin/feed',         icon: Rss,              label: 'Feed' },
+  { href: '/admin/users',        icon: Users,            label: 'Alumnos' },
+  { href: '/admin/invitations',  icon: Mail,             label: 'Invitaciones' },
 ]
 
 export function AdminSidebar() {

@@ -1,0 +1,174 @@
+'use client'
+
+import { useState } from 'react'
+import { Check, Users, CalendarDays } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { useToast } from '@/components/ui/Toast'
+import { createClient } from '@/lib/supabase/client'
+import { TIME_BLOCKS, WEEK_DAYS } from '@/config/schedule'
+import type { Database } from '@/types/database'
+
+type Session = Database['public']['Tables']['schedule_sessions']['Row']
+type Attendance = Database['public']['Tables']['attendance']['Row']
+
+interface Student {
+  id: string
+  full_name: string | null
+  avatar_url: string | null
+}
+
+interface AdminAttendanceManagerProps {
+  sessions: Session[]
+  students: Student[]
+  attendance: Attendance[]
+  weekStart: string
+}
+
+export function AdminAttendanceManager({ sessions, students, attendance: initial, weekStart }: AdminAttendanceManagerProps) {
+  const supabase = createClient()
+  const { toast } = useToast()
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null)
+  const [attendance, setAttendance] = useState<Attendance[]>(initial)
+  const [toggling, setToggling] = useState<string | null>(null)
+
+  function isPresent(studentId: string) {
+    return attendance.some(a => a.session_id === selectedSession?.id && a.user_id === studentId)
+  }
+
+  async function toggleAttendance(student: Student) {
+    if (!selectedSession) return
+    setToggling(student.id)
+
+    const present = isPresent(student.id)
+
+    if (present) {
+      await supabase
+        .from('attendance')
+        .delete()
+        .eq('session_id', selectedSession.id)
+        .eq('user_id', student.id)
+      setAttendance(prev => prev.filter(a => !(a.session_id === selectedSession.id && a.user_id === student.id)))
+      toast(`${student.full_name} — ausente`)
+    } else {
+      const { data } = await supabase
+        .from('attendance')
+        .insert({ session_id: selectedSession.id, user_id: student.id })
+        .select()
+        .single()
+      if (data) {
+        setAttendance(prev => [...prev, data])
+        toast(`${student.full_name} — presente ✓`)
+      }
+    }
+    setToggling(null)
+  }
+
+  const presentCount = selectedSession
+    ? attendance.filter(a => a.session_id === selectedSession.id).length
+    : 0
+
+  return (
+    <div className="px-4 py-4 space-y-4 max-w-2xl mx-auto">
+
+      {/* Week label */}
+      <div className="flex items-center gap-2 text-xs text-text-muted">
+        <CalendarDays size={13} />
+        Semana del {new Date(weekStart + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}
+      </div>
+
+      {/* Session selector */}
+      {sessions.length === 0 ? (
+        <Card className="text-center py-10 space-y-2">
+          <CalendarDays size={28} className="text-text-muted mx-auto" />
+          <p className="text-sm text-text-muted">No hay sesiones programadas esta semana</p>
+          <p className="text-xs text-text-muted">Crea sesiones en el módulo Programa</p>
+        </Card>
+      ) : (
+        <div>
+          <p className="text-xs text-text-muted font-medium uppercase tracking-wider mb-2">Selecciona una sesión</p>
+          <div className="space-y-1.5">
+            {sessions.map(session => {
+              const block = TIME_BLOCKS[session.time_block as keyof typeof TIME_BLOCKS]
+              const day = WEEK_DAYS[session.day_of_week as keyof typeof WEEK_DAYS]
+              const count = attendance.filter(a => a.session_id === session.id).length
+              const isSelected = selectedSession?.id === session.id
+
+              return (
+                <button
+                  key={session.id}
+                  onClick={() => setSelectedSession(isSelected ? null : session)}
+                  className={`w-full text-left p-3 rounded-xl border transition-colors ${
+                    isSelected
+                      ? 'border-pink bg-pink/10'
+                      : 'border-border bg-surface hover:border-pink/30'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{session.title}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{day} · {block?.start} – {block?.end}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-text-muted shrink-0">
+                      <Users size={12} />
+                      {count}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Student list */}
+      {selectedSession && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">
+              Alumnos — {selectedSession.title}
+            </p>
+            <p className="text-xs text-pink font-medium">{presentCount} / {students.length} presentes</p>
+          </div>
+
+          {students.length === 0 ? (
+            <Card className="text-center py-8 text-sm text-text-muted">
+              No hay alumnos activos aún
+            </Card>
+          ) : (
+            <div className="space-y-1.5">
+              {students.map(student => {
+                const present = isPresent(student.id)
+                const loading = toggling === student.id
+                const initials = student.full_name
+                  ?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
+
+                return (
+                  <button
+                    key={student.id}
+                    onClick={() => toggleAttendance(student)}
+                    disabled={loading}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                      present
+                        ? 'border-green-700/50 bg-green-900/20'
+                        : 'border-border bg-surface hover:border-white/20'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-pink/10 flex items-center justify-center shrink-0 text-pink text-sm font-bold">
+                      {initials}
+                    </div>
+                    <p className="flex-1 text-left text-sm font-medium">{student.full_name || 'Sin nombre'}</p>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      present ? 'bg-green-500 border-green-500' : 'border-border'
+                    }`}>
+                      {present && <Check size={13} strokeWidth={3} className="text-white" />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
