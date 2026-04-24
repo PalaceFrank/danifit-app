@@ -71,9 +71,14 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-text-muted">
-          ¿No tienes cuenta? Solicita una invitación a tu Coach
-        </p>
+        <div className="space-y-2 text-center">
+          <a href="/forgot-password" className="block text-xs text-text-muted hover:text-white transition-colors">
+            ¿Olvidaste tu contraseña?
+          </a>
+          <p className="text-xs text-text-muted">
+            ¿No tienes cuenta? Solicita una invitación a tu Coach
+          </p>
+        </div>
       </div>
     </div>
   )

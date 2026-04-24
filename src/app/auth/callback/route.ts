@@ -10,7 +10,11 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Check role to redirect appropriately
+      // If next is explicitly set (e.g. password reset), honor it
+      if (next !== '/schedule') {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+      // Otherwise check role to redirect appropriately
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data: profile } = await supabase
