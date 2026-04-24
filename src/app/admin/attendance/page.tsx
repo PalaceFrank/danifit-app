@@ -19,8 +19,7 @@ export default async function AttendancePage() {
       .order('time_block'),
     adminClient
       .from('profiles')
-      .select('id, full_name, avatar_url')
-      .eq('role', 'student')
+      .select('id, full_name, avatar_url, role')
       .eq('status', 'active')
       .order('full_name'),
   ])

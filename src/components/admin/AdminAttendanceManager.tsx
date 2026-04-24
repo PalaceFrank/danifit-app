@@ -15,6 +15,7 @@ interface Student {
   id: string
   full_name: string | null
   avatar_url: string | null
+  role: string
 }
 
 interface AdminAttendanceManagerProps {
@@ -156,7 +157,12 @@ export function AdminAttendanceManager({ sessions, students, attendance: initial
                     <div className="w-9 h-9 rounded-xl bg-pink/10 flex items-center justify-center shrink-0 text-pink text-sm font-bold">
                       {initials}
                     </div>
-                    <p className="flex-1 text-left text-sm font-medium">{student.full_name || 'Sin nombre'}</p>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium">{student.full_name || 'Sin nombre'}</p>
+                      {student.role === 'admin' && (
+                        <p className="text-[10px] text-pink">Coach</p>
+                      )}
+                    </div>
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                       present ? 'bg-green-500 border-green-500' : 'border-border'
                     }`}>
