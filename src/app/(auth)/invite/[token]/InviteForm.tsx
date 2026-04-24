@@ -62,7 +62,9 @@ export function InviteForm({ invitationId, defaultName }: InviteFormProps) {
       body: JSON.stringify({ invitationId, userId: data.user.id }),
     })
 
-    router.push('/register-complete')
+    // Sign in immediately so the session is active
+    await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
+    window.location.href = '/schedule'
   }
 
   return (
