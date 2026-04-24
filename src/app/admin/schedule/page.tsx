@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { TopBar } from '@/components/layout/TopBar'
 import { AdminScheduleManager } from '@/components/admin/AdminScheduleManager'
 import { getWeekStart, formatWeekStart } from '@/config/schedule'
 
@@ -14,10 +13,5 @@ export default async function AdminSchedulePage() {
     .order('day_of_week')
     .order('time_block')
 
-  return (
-    <>
-      <TopBar title="Programa semanal" />
-      <AdminScheduleManager sessions={sessions || []} weekStart={weekStart} />
-    </>
-  )
+  return <AdminScheduleManager sessions={sessions || []} weekStart={weekStart} />
 }

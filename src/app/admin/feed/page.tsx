@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { TopBar } from '@/components/layout/TopBar'
 import { AdminFeedManager } from '@/components/admin/AdminFeedManager'
 
 export default async function AdminFeedPage() {
@@ -19,14 +18,11 @@ export default async function AdminFeedPage() {
   ])
 
   return (
-    <>
-      <TopBar title="Feed" />
-      <AdminFeedManager
-        posts={posts || []}
-        adminId={user!.id}
-        reactions={reactions || []}
-        comments={comments || []}
-      />
-    </>
+    <AdminFeedManager
+      posts={posts || []}
+      adminId={user!.id}
+      reactions={reactions || []}
+      comments={comments || []}
+    />
   )
 }

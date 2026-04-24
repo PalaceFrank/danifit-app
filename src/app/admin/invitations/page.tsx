@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { TopBar } from '@/components/layout/TopBar'
 import { InvitationsManager } from '@/components/admin/InvitationsManager'
 
 export default async function InvitationsPage() {
@@ -11,10 +10,5 @@ export default async function InvitationsPage() {
     .select('*')
     .order('created_at', { ascending: false })
 
-  return (
-    <>
-      <TopBar title="Invitaciones" />
-      <InvitationsManager invitations={invitations || []} adminId={user!.id} />
-    </>
-  )
+  return <InvitationsManager invitations={invitations || []} adminId={user!.id} />
 }

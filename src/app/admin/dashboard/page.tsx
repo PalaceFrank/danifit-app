@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { TopBar } from '@/components/layout/TopBar'
 import { Card } from '@/components/ui/Card'
 import {
   Users, UserCheck, Rss, Mail,
@@ -119,9 +118,7 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <>
-      <TopBar title="Dashboard" />
-      <div className="px-4 py-5 space-y-6 max-w-2xl mx-auto">
+    <div className="px-4 py-5 space-y-6 max-w-2xl mx-auto">
 
         {/* Stats */}
         <div>
@@ -202,7 +199,6 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-      </div>
-    </>
+    </div>
   )
 }

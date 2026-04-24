@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/server'
-import { TopBar } from '@/components/layout/TopBar'
 import { AdminAttendanceManager } from '@/components/admin/AdminAttendanceManager'
 import { getWeekStart, formatWeekStart } from '@/config/schedule'
 
@@ -31,14 +30,11 @@ export default async function AttendancePage() {
     .in('session_id', sessionIds)
 
   return (
-    <>
-      <TopBar title="Asistencia" />
-      <AdminAttendanceManager
-        sessions={sessions || []}
-        students={students || []}
-        attendance={attendance || []}
-        weekStart={weekStart}
-      />
-    </>
+    <AdminAttendanceManager
+      sessions={sessions || []}
+      students={students || []}
+      attendance={attendance || []}
+      weekStart={weekStart}
+    />
   )
 }
