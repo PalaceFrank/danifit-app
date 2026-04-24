@@ -203,24 +203,7 @@ export function AdminScheduleManager({ sessions: initial, weekStart }: AdminSche
               />
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-text-muted block mb-1.5">Nivel</label>
-              <div className="grid grid-cols-2 gap-2">
-                {(['all', 'beginner', 'intermediate', 'advanced'] as const).map(l => (
-                  <button
-                    key={l}
-                    onClick={() => setForm(p => ({ ...p, level: l }))}
-                    className={`py-2 rounded-xl border text-xs font-medium transition-colors ${
-                      form.level === l ? 'border-pink bg-pink/10' : 'border-border bg-background text-text-muted'
-                    }`}
-                  >
-                    {l === 'all' ? 'Todos' : l === 'beginner' ? 'Principiante' : l === 'intermediate' ? 'Intermedio' : 'Avanzado'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <Input label="Materiales / qué traer" value={form.materials} onChange={e => setForm(p => ({ ...p, materials: e.target.value }))} placeholder="Ej: Botella de agua, peto, zapatillas" />
+<Input label="Materiales / qué traer" value={form.materials} onChange={e => setForm(p => ({ ...p, materials: e.target.value }))} placeholder="Ej: Botella de agua, peto, zapatillas" />
             <Input label="Ubicación" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="Parque Las Américas" />
 
             <Button onClick={saveSession} loading={saving} className="w-full" size="lg">
