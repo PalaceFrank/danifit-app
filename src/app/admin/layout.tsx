@@ -1,15 +1,6 @@
-import Link from 'next/link'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { CalendarDays, Users, Rss, Mail, LayoutDashboard } from 'lucide-react'
-
-const ADMIN_NAV = [
-  { href: '/admin/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/schedule',     icon: CalendarDays,    label: 'Programa' },
-  { href: '/admin/feed',         icon: Rss,             label: 'Feed' },
-  { href: '/admin/users',        icon: Users,           label: 'Alumnos' },
-  { href: '/admin/invitations',  icon: Mail,            label: 'Invitaciones' },
-]
+import { AdminSidebar, AdminBottomNav } from '@/components/admin/AdminNav'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -28,40 +19,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-dvh flex">
       {/* Sidebar (md+) */}
-      <aside className="hidden md:flex w-56 border-r border-border bg-surface flex-col p-4 gap-1">
-        <div className="flex items-center gap-2 mb-6 px-2">
-          <div className="w-8 h-8 bg-pink rounded-lg flex items-center justify-center">
-            <span className="text-white font-black text-xs">DF</span>
+      <aside className="hidden md:flex w-60 border-r border-border bg-surface flex-col p-4">
+        <div className="flex items-center gap-3 mb-8 px-2 pt-2">
+          <div className="w-9 h-9 bg-pink rounded-xl flex items-center justify-center shadow-md shadow-pink/20">
+            <span className="text-white font-black text-sm">DF</span>
           </div>
-          <span className="font-bold text-sm">Admin</span>
+          <div>
+            <p className="font-bold text-sm leading-tight">Danifit</p>
+            <p className="text-[10px] text-text-muted">Panel admin</p>
+          </div>
         </div>
-        {ADMIN_NAV.map(({ href, icon: Icon, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-text-muted hover:text-white hover:bg-white/5 transition-colors"
-          >
-            <Icon size={18} />
-            {label}
-          </Link>
-        ))}
+        <AdminSidebar />
       </aside>
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
-
-        {/* Bottom nav (mobile) */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border safe-bottom z-50">
-          <div className="flex items-center justify-around px-2 py-2">
-            {ADMIN_NAV.map(({ href, icon: Icon, label }) => (
-              <Link key={href} href={href} className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-text-muted">
-                <Icon size={20} />
-                <span className="text-[9px]">{label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
+        <AdminBottomNav />
       </div>
     </div>
   )

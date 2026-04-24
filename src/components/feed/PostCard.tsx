@@ -143,30 +143,36 @@ export function PostCard({ post, reactions: initialReactions, comments: initialC
       )}
 
       {/* Reactions */}
-      <div className="px-4 py-3 flex items-center gap-2 border-t border-border">
-        {EMOJIS.map(emoji => (
-          <button
-            key={emoji}
-            onClick={() => toggleReaction(emoji)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-sm transition-colors ${
-              userReactions.includes(emoji)
-                ? 'bg-pink/20 border border-pink/40'
-                : 'bg-white/5 border border-transparent hover:bg-white/10'
-            }`}
-          >
-            <span>{emoji}</span>
-            {countReaction(emoji) > 0 && (
-              <span className="text-xs text-text-muted">{countReaction(emoji)}</span>
-            )}
-          </button>
-        ))}
+      <div className="px-4 py-3 flex items-center gap-1.5 border-t border-border">
+        {EMOJIS.map(emoji => {
+          const count = countReaction(emoji)
+          const active = userReactions.includes(emoji)
+          return (
+            <button
+              key={emoji}
+              onClick={() => toggleReaction(emoji)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-base transition-all active:scale-95 ${
+                active
+                  ? 'bg-pink/20 border border-pink/40 shadow-sm shadow-pink/10'
+                  : 'bg-white/5 border border-transparent hover:bg-white/10'
+              }`}
+            >
+              <span className="leading-none">{emoji}</span>
+              {count > 0 && (
+                <span className={`text-xs font-medium ${active ? 'text-pink' : 'text-text-muted'}`}>{count}</span>
+              )}
+            </button>
+          )
+        })}
 
         <button
           onClick={() => setShowComments(!showComments)}
-          className="ml-auto flex items-center gap-1.5 text-xs text-text-muted hover:text-white transition-colors"
+          className={`ml-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs transition-colors ${
+            showComments ? 'bg-white/10 text-white' : 'text-text-muted hover:text-white hover:bg-white/5'
+          }`}
         >
-          <MessageCircle size={15} />
-          {topComments.length > 0 && <span>{topComments.length}</span>}
+          <MessageCircle size={16} strokeWidth={showComments ? 2.5 : 1.8} />
+          <span className="font-medium">{topComments.length > 0 ? topComments.length : 'Comentar'}</span>
         </button>
       </div>
 

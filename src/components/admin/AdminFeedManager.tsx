@@ -6,6 +6,7 @@ import { Plus, Pin, PinOff, Trash2, Image as ImageIcon, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import type { Database, PostType } from '@/types/database'
 
@@ -26,6 +27,7 @@ interface AdminFeedManagerProps {
 
 export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerProps) {
   const supabase = createClient()
+  const { toast } = useToast()
   const [posts, setPosts] = useState(initial)
   const [content, setContent] = useState('')
   const [postType, setPostType] = useState<PostType>('general')
@@ -65,7 +67,12 @@ export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerPr
       .select()
       .single()
 
-    if (data) setPosts(prev => [data, ...prev])
+    if (data) {
+      setPosts(prev => [data, ...prev])
+      toast('Publicación enviada ✓')
+    } else {
+      toast('Error al publicar', 'error')
+    }
     setContent('')
     setPostType('general')
     setImageFile(null)
@@ -80,13 +87,17 @@ export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerPr
       .eq('id', post.id)
       .select()
       .single()
-    if (data) setPosts(prev => prev.map(p => p.id === post.id ? data : p))
+    if (data) {
+      setPosts(prev => prev.map(p => p.id === post.id ? data : p))
+      toast(data.is_pinned ? 'Post fijado' : 'Post desfijado')
+    }
   }
 
   async function deletePost(postId: string) {
     if (!confirm('¿Eliminar esta publicación?')) return
     await supabase.from('posts').delete().eq('id', postId)
     setPosts(prev => prev.filter(p => p.id !== postId))
+    toast('Publicación eliminada')
   }
 
   return (

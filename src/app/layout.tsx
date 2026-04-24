@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
+import { ToastProvider } from '@/components/ui/Toast'
 import './globals.css'
 
 const geistSans = localFont({
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className={`${geistSans.variable} font-sans antialiased bg-background text-white`}>
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   )
