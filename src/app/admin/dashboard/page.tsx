@@ -169,9 +169,8 @@ export default async function DashboardPage() {
                       <span className="text-text-muted">
                         {item.type === 'reaction' ? 'reaccionó a' : 'comentó en'}
                       </span>
-                      {' '}
-                      <span className="text-text-muted italic truncate">"{item.postSnippet}{item.postSnippet.length === 50 ? '…' : ''}"</span>
                     </p>
+                    <p className="text-sm text-text-muted italic truncate">"{item.postSnippet}{item.postSnippet.length === 50 ? '…' : ''}"</p>
                     {item.commentSnippet && (
                       <p className="text-xs text-white/70 mt-0.5 line-clamp-1">"{item.commentSnippet}"</p>
                     )}
