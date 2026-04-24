@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Users, Rss, Mail, LayoutDashboard } from 'lucide-react'
+import { CalendarDays, Users, Rss, Mail, LayoutDashboard, ArrowLeftRight } from 'lucide-react'
 
 const ADMIN_NAV = [
   { href: '/admin/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
@@ -15,7 +15,7 @@ const ADMIN_NAV = [
 export function AdminSidebar() {
   const pathname = usePathname()
   return (
-    <nav className="space-y-0.5">
+    <nav className="flex flex-col flex-1 space-y-0.5">
       {ADMIN_NAV.map(({ href, icon: Icon, label }) => {
         const active = pathname.startsWith(href)
         return (
@@ -33,6 +33,14 @@ export function AdminSidebar() {
           </Link>
         )
       })}
+      <div className="flex-1" />
+      <Link
+        href="/schedule"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-text-muted hover:text-white hover:bg-white/5 transition-colors border-t border-border pt-4 mt-2"
+      >
+        <ArrowLeftRight size={18} strokeWidth={1.8} />
+        Vista alumno
+      </Link>
     </nav>
   )
 }
@@ -57,6 +65,14 @@ export function AdminBottomNav() {
             </Link>
           )
         })}
+        <div className="w-px h-6 bg-border self-center" />
+        <Link
+          href="/schedule"
+          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors text-text-muted"
+        >
+          <ArrowLeftRight size={20} strokeWidth={1.8} />
+          <span className="text-[9px] font-medium">Alumno</span>
+        </Link>
       </div>
     </nav>
   )
