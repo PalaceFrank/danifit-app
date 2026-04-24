@@ -48,25 +48,26 @@ export default async function DashboardPage() {
       .limit(15),
   ])
 
-  // Merge and sort activity
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type AnyRow = any
   const activity = [
-    ...(recentReactions || []).map((r: any) => ({
+    ...(recentReactions || []).map((r: AnyRow) => ({
       id: `r-${r.id}`,
       type: 'reaction' as const,
-      emoji: r.emoji,
-      studentName: r.profiles?.full_name || 'Alumno',
-      postSnippet: (r.posts?.content || '').slice(0, 50),
-      date: r.created_at,
+      emoji: r.emoji as string,
+      studentName: (r.profiles?.full_name || 'Alumno') as string,
+      postSnippet: ((r.posts?.content || '') as string).slice(0, 50),
+      commentSnippet: undefined as string | undefined,
+      date: r.created_at as string,
     })),
-    ...(recentComments || []).map((c: any) => ({
+    ...(recentComments || []).map((c: AnyRow) => ({
       id: `c-${c.id}`,
       type: 'comment' as const,
-      emoji: null,
-      studentName: c.profiles?.full_name || 'Alumno',
-      postSnippet: (c.posts?.content || '').slice(0, 50),
-      commentSnippet: (c.content || '').slice(0, 60),
-      date: c.created_at,
+      emoji: null as null,
+      studentName: (c.profiles?.full_name || 'Alumno') as string,
+      postSnippet: ((c.posts?.content || '') as string).slice(0, 50),
+      commentSnippet: ((c.content || '') as string).slice(0, 60),
+      date: c.created_at as string,
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8)
 
@@ -174,7 +175,7 @@ export default async function DashboardPage() {
                       {' '}
                       <span className="text-text-muted italic truncate">"{item.postSnippet}{item.postSnippet.length === 50 ? '…' : ''}"</span>
                     </p>
-                    {'commentSnippet' in item && item.commentSnippet && (
+                    {item.commentSnippet && (
                       <p className="text-xs text-white/70 mt-0.5 line-clamp-1">"{item.commentSnippet}"</p>
                     )}
                   </div>
