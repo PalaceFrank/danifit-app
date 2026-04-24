@@ -177,7 +177,7 @@ export function AdminScheduleManager({ sessions: initial, weekStart }: AdminSche
       {/* Edit modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end">
-          <div className="w-full bg-surface border-t border-border rounded-t-3xl p-6 space-y-4 max-h-[90dvh] overflow-y-auto">
+          <div className="w-full bg-surface border-t border-border rounded-t-3xl p-6 pb-24 md:pb-6 space-y-4 max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-bold">Editar sesión</h2>
