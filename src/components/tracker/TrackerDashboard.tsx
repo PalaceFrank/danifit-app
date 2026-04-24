@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, TrendingDown, TrendingUp, Minus } from 'lucide-react'
+import { Plus, TrendingDown, TrendingUp, Minus, Pencil } from 'lucide-react'
+import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -53,13 +54,33 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
 
   return (
     <div className="px-4 py-4 space-y-4 max-w-lg mx-auto">
-      {/* Goal banner */}
-      {bodyProfile.goal && (
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-text-muted">Meta</span>
-          <Badge variant="pink">{GOAL_LABELS[bodyProfile.goal]}</Badge>
+      {/* Goal + edit */}
+      <div className="flex items-center justify-between">
+        {bodyProfile.goal
+          ? <Badge variant="pink">{GOAL_LABELS[bodyProfile.goal]}</Badge>
+          : <span className="text-xs text-text-muted">Sin meta definida</span>
+        }
+        <Link href="/tracker/onboarding" className="flex items-center gap-1 text-xs text-text-muted hover:text-white transition-colors">
+          <Pencil size={11} />
+          Editar perfil
+        </Link>
+      </div>
+
+      {/* Body profile summary (always visible) */}
+      <Card padded={false} className="p-3 grid grid-cols-3 divide-x divide-border text-center">
+        <div className="px-3">
+          <p className="text-xs text-text-muted">Altura</p>
+          <p className="text-sm font-semibold mt-0.5">{bodyProfile.height_cm ? `${bodyProfile.height_cm} cm` : '—'}</p>
         </div>
-      )}
+        <div className="px-3">
+          <p className="text-xs text-text-muted">Peso inicial</p>
+          <p className="text-sm font-semibold mt-0.5">{bodyProfile.initial_weight_kg ? `${bodyProfile.initial_weight_kg} kg` : '—'}</p>
+        </div>
+        <div className="px-3">
+          <p className="text-xs text-text-muted">Peso objetivo</p>
+          <p className="text-sm font-semibold mt-0.5">{bodyProfile.target_weight_kg ? `${bodyProfile.target_weight_kg} kg` : '—'}</p>
+        </div>
+      </Card>
 
       {/* Stats cards */}
       {latest ? (

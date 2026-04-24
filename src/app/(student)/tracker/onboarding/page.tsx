@@ -2,11 +2,12 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { useToast } from '@/components/ui/Toast'
 import type { Goal, ActivityLevel } from '@/types/database'
 
 const GOALS: { value: Goal; label: string; desc: string }[] = [
@@ -34,8 +35,11 @@ type Step = 'basic' | 'goal' | 'activity' | 'diet'
 export default function OnboardingPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { toast } = useToast()
   const [step, setStep] = useState<Step>('basic')
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
 
   const [form, setForm] = useState({
     birth_date: '',
@@ -48,6 +52,37 @@ export default function OnboardingPage() {
     dietary_preferences: [] as string[],
     dietary_restrictions: '',
   })
+
+  useEffect(() => {
+    async function loadExisting() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+
+      const { data } = await supabase
+        .from('user_body_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (data) {
+        setIsEditing(true)
+        setForm({
+          birth_date: data.birth_date ?? '',
+          sex: (data.sex as 'male' | 'female' | '') ?? '',
+          height_cm: data.height_cm?.toString() ?? '',
+          initial_weight_kg: data.initial_weight_kg?.toString() ?? '',
+          target_weight_kg: data.target_weight_kg?.toString() ?? '',
+          goal: (data.goal as Goal | '') ?? '',
+          activity_level: (data.activity_level as ActivityLevel | '') ?? '',
+          dietary_preferences: (data.dietary_preferences as string[]) ?? [],
+          dietary_restrictions: data.dietary_restrictions ?? '',
+        })
+      }
+      setFetching(false)
+    }
+    loadExisting()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function update(key: string, value: unknown) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -67,7 +102,7 @@ export default function OnboardingPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
 
-    await supabase.from('user_body_profiles').upsert({
+    const { error } = await supabase.from('user_body_profiles').upsert({
       user_id: user.id,
       birth_date: form.birth_date || null,
       sex: form.sex || null,
@@ -80,14 +115,41 @@ export default function OnboardingPage() {
       dietary_restrictions: form.dietary_restrictions || null,
     }, { onConflict: 'user_id' })
 
+    if (error) {
+      toast('Error al guardar. Intenta de nuevo.', 'error')
+      setLoading(false)
+      return
+    }
+
+    toast('Perfil guardado ✓')
     router.push('/tracker')
   }
 
   const steps: Step[] = ['basic', 'goal', 'activity', 'diet']
   const stepIndex = steps.indexOf(step)
 
+  if (fetching) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-pink border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-dvh flex flex-col px-6 py-8 max-w-sm mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-xs text-text-muted font-medium uppercase tracking-wider">
+          {isEditing ? 'Editar perfil físico' : 'Perfil físico'}
+        </p>
+        {isEditing && (
+          <button onClick={() => router.push('/tracker')} className="text-xs text-text-muted hover:text-white">
+            Cancelar
+          </button>
+        )}
+      </div>
+
       {/* Progress */}
       <div className="flex gap-1.5 mb-8">
         {steps.map((s, i) => (
@@ -249,7 +311,7 @@ export default function OnboardingPage() {
           </Button>
         ) : (
           <Button onClick={handleSubmit} loading={loading} className="flex-1">
-            Listo
+            {isEditing ? 'Guardar cambios' : 'Listo'}
           </Button>
         )}
       </div>
