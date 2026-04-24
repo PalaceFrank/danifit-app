@@ -19,20 +19,16 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error || !data.user) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
       setError('Correo o contraseña incorrectos')
       setLoading(false)
       return
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
-
-    window.location.href = profile?.role === 'admin' ? '/admin/dashboard' : '/schedule'
+    const res = await fetch('/api/auth/role')
+    const { role } = await res.json() as { role: string | null }
+    window.location.href = role === 'admin' ? '/admin/dashboard' : '/schedule'
   }
 
   return (
