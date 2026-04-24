@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { BottomNav } from '@/components/layout/BottomNav'
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   let isAdmin = false
@@ -8,8 +8,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      const adminSupabase = await createAdminClient()
-      const { data: profile } = await adminSupabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
