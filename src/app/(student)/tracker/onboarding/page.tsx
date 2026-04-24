@@ -186,7 +186,7 @@ export default function OnboardingPage() {
           <>
             <div>
               <h1 className="text-xl font-bold">Nivel de actividad</h1>
-              <p className="text-sm text-text-muted mt-1">Fuera de tus clases con Daniel</p>
+              <p className="text-sm text-text-muted mt-1">Fuera de tus clases con tu Coach</p>
             </div>
             <div className="space-y-2">
               {ACTIVITY_LEVELS.map(a => (

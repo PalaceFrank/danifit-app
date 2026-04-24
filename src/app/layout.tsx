@@ -14,9 +14,11 @@ export const metadata: Metadata = {
   description: 'Tu entrenador personal — rutinas, seguimiento y comunidad',
   manifest: '/manifest.json',
   appleWebApp: {
-    capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Danifit',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
 }
 

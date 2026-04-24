@@ -1,7 +1,7 @@
 {
   "name": "Danifit",
   "short_name": "Danifit",
-  "description": "Tu entrenador personal Daniel — rutinas, seguimiento y comunidad",
+  "description": "Tu entrenador personal — rutinas, seguimiento y comunidad",
   "start_url": "/schedule",
   "display": "standalone",
   "background_color": "#0a0a0a",

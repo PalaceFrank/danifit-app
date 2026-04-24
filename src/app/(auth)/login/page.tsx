@@ -76,7 +76,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-xs text-text-muted">
-          ¿No tienes cuenta? Solicita una invitación a Daniel
+          ¿No tienes cuenta? Solicita una invitación a tu Coach
         </p>
       </div>
     </div>

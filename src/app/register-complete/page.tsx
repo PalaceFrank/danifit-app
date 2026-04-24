@@ -7,7 +7,7 @@ export default function RegisterCompletePage() {
         </div>
         <h1 className="text-2xl font-bold">¡Registro completado!</h1>
         <p className="text-text-muted text-sm leading-relaxed">
-          Tu cuenta está siendo revisada por Daniel. Recibirás acceso en cuanto sea aprobada.
+          Tu cuenta está siendo revisada por tu Coach. Recibirás acceso en cuanto sea aprobada.
         </p>
         <p className="text-xs text-text-muted">
           Si tienes dudas, escríbele directamente a tu entrenador.

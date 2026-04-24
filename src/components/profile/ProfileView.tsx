@@ -27,7 +27,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_DESC: Record<string, string> = {
   active:   'Tu cuenta está activa y tienes acceso completo.',
-  pending:  'Daniel aún no ha activado tu cuenta.',
+  pending:  'Tu Coach aún no ha activado tu cuenta.',
   inactive: 'Tu cuenta ha sido desactivada.',
 }
 

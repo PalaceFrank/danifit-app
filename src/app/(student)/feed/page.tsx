@@ -43,7 +43,7 @@ export default async function FeedPage() {
             </div>
             <div>
               <p className="font-semibold text-white">Sin publicaciones aún</p>
-              <p className="text-sm text-text-muted mt-1">Daniel compartirá rutinas, avisos y motivación aquí.</p>
+              <p className="text-sm text-text-muted mt-1">Tu Coach compartirá rutinas, avisos y motivación aquí.</p>
             </div>
           </div>
         )}
@@ -60,7 +60,7 @@ export default async function FeedPage() {
               comments={postComments}
               currentUserId={user.id}
               isAdmin={profile?.role === 'admin'}
-              authorName={(post as { profiles?: { full_name?: string } }).profiles?.full_name || 'Daniel'}
+              authorName={(post as { profiles?: { full_name?: string } }).profiles?.full_name || 'Coach'}
             />
           )
         })}
