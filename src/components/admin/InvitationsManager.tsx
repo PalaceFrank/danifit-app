@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Plus, Clock, UserCheck } from 'lucide-react'
+import { Copy, Check, Plus, Clock, UserCheck, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
+import { useToast } from '@/components/ui/Toast'
+import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
 
 type Invitation = Database['public']['Tables']['invitations']['Row']
@@ -16,6 +18,8 @@ interface InvitationsManagerProps {
 }
 
 export function InvitationsManager({ invitations: initial, adminId }: InvitationsManagerProps) {
+  const supabase = createClient()
+  const { toast } = useToast()
   const [invitations, setInvitations] = useState(initial)
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -38,6 +42,13 @@ export function InvitationsManager({ invitations: initial, adminId }: Invitation
 
   function getInviteUrl(token: string) {
     return `${window.location.origin}/invite/${token}`
+  }
+
+  async function deleteInvitation(id: string) {
+    const { error } = await supabase.from('invitations').delete().eq('id', id)
+    if (error) { toast('Error al eliminar', 'error'); return }
+    setInvitations(prev => prev.filter(i => i.id !== id))
+    toast('Invitación eliminada')
   }
 
   async function copyLink(token: string, id: string) {
@@ -106,18 +117,27 @@ export function InvitationsManager({ invitations: initial, adminId }: Invitation
                   )}
                 </div>
               </div>
-              {inv.status === 'pending' && (
+              <div className="flex items-center gap-1 shrink-0">
+                {inv.status === 'pending' && (
+                  <button
+                    onClick={() => copyLink(inv.token, inv.id)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    {copiedId === inv.id ? (
+                      <><Check size={13} className="text-green-400" /> Copiado</>
+                    ) : (
+                      <><Copy size={13} /> Copiar link</>
+                    )}
+                  </button>
+                )}
                 <button
-                  onClick={() => copyLink(inv.token, inv.id)}
-                  className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors shrink-0"
+                  onClick={() => deleteInvitation(inv.id)}
+                  className="p-2 rounded-lg hover:bg-red-900/20 text-text-muted hover:text-red-400 transition-colors"
+                  title="Eliminar invitación"
                 >
-                  {copiedId === inv.id ? (
-                    <><Check size={13} className="text-green-400" /> Copiado</>
-                  ) : (
-                    <><Copy size={13} /> Copiar link</>
-                  )}
+                  <Trash2 size={14} />
                 </button>
-              )}
+              </div>
             </div>
           </Card>
         ))}
