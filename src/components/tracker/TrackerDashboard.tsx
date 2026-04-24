@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { NewMeasurementModal } from './NewMeasurementModal'
+import { ProgressChart } from './ProgressChart'
 import { calcBodyFatNavy } from '@/lib/body-calc'
 import type { Database } from '@/types/database'
 
@@ -120,6 +121,15 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
         Nueva medición
       </Button>
 
+      {/* Progress chart */}
+      {allMeasurements.length >= 2 && (
+        <ProgressChart
+          measurements={allMeasurements}
+          sex={bodyProfile.sex}
+          heightCm={bodyProfile.height_cm}
+        />
+      )}
+
       {/* History */}
       {allMeasurements.length > 0 && (
         <div className="space-y-2">
@@ -159,6 +169,7 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
           userId={userId}
           sex={bodyProfile.sex}
           heightCm={bodyProfile.height_cm}
+          lastMeasurement={latest ?? null}
           onSave={handleNewMeasurement}
           onClose={() => setShowModal(false)}
         />
