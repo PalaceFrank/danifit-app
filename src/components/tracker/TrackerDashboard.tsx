@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, TrendingDown, TrendingUp, Minus, Pencil } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -158,6 +159,11 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
                   {i === 0 && <Badge variant="pink">Último</Badge>}
                 </div>
                 {m.notes && <p className="text-xs text-text-muted mt-1 italic">{m.notes}</p>}
+                {m.photo_url && (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden mt-2">
+                    <Image src={m.photo_url} alt="Foto de progreso" fill className="object-cover" sizes="400px" />
+                  </div>
+                )}
               </Card>
             )
           })}
@@ -169,6 +175,7 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
           userId={userId}
           sex={bodyProfile.sex}
           heightCm={bodyProfile.height_cm}
+          birthDate={bodyProfile.birth_date ?? null}
           lastMeasurement={latest ?? null}
           onSave={handleNewMeasurement}
           onClose={() => setShowModal(false)}
