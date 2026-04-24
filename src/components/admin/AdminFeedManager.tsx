@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Plus, Pin, PinOff, Trash2, Image as ImageIcon, X } from 'lucide-react'
+import { Plus, Pin, PinOff, Trash2, Image as ImageIcon, X, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -11,6 +11,11 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database, PostType } from '@/types/database'
 
 type Post = Database['public']['Tables']['posts']['Row']
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Reaction = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Comment = any
 
 const POST_TYPES: { value: PostType; label: string }[] = [
   { value: 'general',      label: 'General' },
@@ -23,9 +28,11 @@ const POST_TYPES: { value: PostType; label: string }[] = [
 interface AdminFeedManagerProps {
   posts: Post[]
   adminId: string
+  reactions: Reaction[]
+  comments: Comment[]
 }
 
-export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerProps) {
+export function AdminFeedManager({ posts: initial, adminId, reactions, comments }: AdminFeedManagerProps) {
   const supabase = createClient()
   const { toast } = useToast()
   const [posts, setPosts] = useState(initial)
@@ -34,6 +41,7 @@ export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerPr
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
+  const [expandedPost, setExpandedPost] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -182,6 +190,55 @@ export function AdminFeedManager({ posts: initial, adminId }: AdminFeedManagerPr
               </div>
             </div>
             <p className="text-sm text-text-muted leading-relaxed line-clamp-3">{post.content}</p>
+
+            {/* Engagement */}
+            {(() => {
+              const postReactions = reactions.filter((r: Reaction) => r.post_id === post.id)
+              const postComments = comments.filter((c: Comment) => c.post_id === post.id)
+              const reactionGroups = postReactions.reduce((acc: Record<string, { emoji: string; names: string[] }>, r: Reaction) => {
+                if (!acc[r.emoji]) acc[r.emoji] = { emoji: r.emoji, names: [] }
+                acc[r.emoji].names.push(r.profiles?.full_name || 'Alumno')
+                return acc
+              }, {})
+              const isExpanded = expandedPost === post.id
+
+              return (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <div className="flex items-center gap-3">
+                    {Object.values(reactionGroups).map(({ emoji, names }) => (
+                      <span key={emoji} className="text-xs text-text-muted" title={names.join(', ')}>
+                        {emoji} {names.length}
+                      </span>
+                    ))}
+                    {postComments.length > 0 && (
+                      <button
+                        onClick={() => setExpandedPost(isExpanded ? null : post.id)}
+                        className="ml-auto flex items-center gap-1 text-xs text-text-muted hover:text-white transition-colors"
+                      >
+                        <MessageCircle size={12} />
+                        {postComments.length} comentario{postComments.length !== 1 ? 's' : ''}
+                        {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      </button>
+                    )}
+                    {postReactions.length === 0 && postComments.length === 0 && (
+                      <span className="text-xs text-text-muted/50">Sin reacciones aún</span>
+                    )}
+                  </div>
+
+                  {isExpanded && postComments.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {postComments.map((c: Comment) => (
+                        <div key={c.id || c.created_at} className="bg-background rounded-lg px-3 py-2">
+                          <p className="text-xs font-medium text-white">{c.profiles?.full_name || 'Alumno'}</p>
+                          <p className="text-xs text-text-muted mt-0.5">{c.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+
             <p className="text-xs text-text-muted mt-2">
               {new Date(post.created_at).toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
