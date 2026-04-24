@@ -78,7 +78,7 @@ export default function OnboardingPage() {
       activity_level: form.activity_level || null,
       dietary_preferences: form.dietary_preferences,
       dietary_restrictions: form.dietary_restrictions || null,
-    })
+    }, { onConflict: 'user_id' })
 
     router.push('/tracker')
   }
