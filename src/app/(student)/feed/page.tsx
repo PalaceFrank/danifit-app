@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { TopBar } from '@/components/layout/TopBar'
 import { PostCard } from '@/components/feed/PostCard'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Rss } from 'lucide-react'
 
 export default async function FeedPage() {
@@ -37,15 +38,11 @@ export default async function FeedPage() {
       <TopBar title="Feed" />
       <div className="px-4 py-4 space-y-4 max-w-lg mx-auto pb-6">
         {(!posts || posts.length === 0) && (
-          <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-            <div className="w-16 h-16 bg-surface border border-border rounded-2xl flex items-center justify-center">
-              <Rss size={28} className="text-text-muted" />
-            </div>
-            <div>
-              <p className="font-semibold text-white">Sin publicaciones aún</p>
-              <p className="text-sm text-text-muted mt-1">Tu Coach compartirá rutinas, avisos y motivación aquí.</p>
-            </div>
-          </div>
+          <EmptyState
+            icon={Rss}
+            title="Sin publicaciones aún"
+            description="Tu Coach compartirá rutinas, avisos y motivación aquí. ¡Muy pronto!"
+          />
         )}
         {(posts || []).map(post => {
           const postReactions = (reactions || []).filter(r => r.post_id === post.id)

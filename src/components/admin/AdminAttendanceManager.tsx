@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Users, CalendarDays } from 'lucide-react'
+import { Users, CalendarDays } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import { TIME_BLOCKS, WEEK_DAYS } from '@/config/schedule'
@@ -79,10 +81,13 @@ export function AdminAttendanceManager({ sessions, students, attendance: initial
 
       {/* Session selector */}
       {sessions.length === 0 ? (
-        <Card className="text-center py-10 space-y-2">
-          <CalendarDays size={28} className="text-text-muted mx-auto" />
-          <p className="text-sm text-text-muted">No hay sesiones programadas esta semana</p>
-          <p className="text-xs text-text-muted">Crea sesiones en el módulo Programa</p>
+        <Card padded={false}>
+          <EmptyState
+            icon={CalendarDays}
+            title="Sin sesiones esta semana"
+            description="Crea sesiones en el módulo Programa para poder marcar asistencia."
+            action={{ label: 'Ir a Programa', href: '/admin/schedule' }}
+          />
         </Card>
       ) : (
         <div>
@@ -132,11 +137,11 @@ export function AdminAttendanceManager({ sessions, students, attendance: initial
           </div>
 
           {students.length === 0 ? (
-            <Card className="text-center py-8 text-sm text-text-muted">
-              No hay alumnos activos aún
+            <Card padded={false}>
+              <EmptyState icon={Users} title="Sin alumnos activos" description="Activa alumnos desde la sección Alumnos." />
             </Card>
           ) : (
-            <div className="space-y-1.5">
+            <Card padded={false} className="divide-y divide-border">
               {students.map(student => {
                 const present = isPresent(student.id)
                 const loading = toggling === student.id
@@ -144,34 +149,28 @@ export function AdminAttendanceManager({ sessions, students, attendance: initial
                   ?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
 
                 return (
-                  <button
+                  <div
                     key={student.id}
-                    onClick={() => toggleAttendance(student)}
-                    disabled={loading}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                      present
-                        ? 'border-green-700/50 bg-green-900/20'
-                        : 'border-border bg-surface hover:border-white/20'
-                    }`}
+                    className={`flex items-center gap-3 p-3 transition-colors ${present ? 'bg-green-900/10' : ''}`}
                   >
                     <div className="w-9 h-9 rounded-xl bg-pink/10 flex items-center justify-center shrink-0 text-pink text-sm font-bold">
                       {initials}
                     </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-medium">{student.full_name || 'Sin nombre'}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{student.full_name || 'Sin nombre'}</p>
                       {student.role === 'admin' && (
                         <p className="text-[10px] text-pink">Coach</p>
                       )}
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                      present ? 'bg-green-500 border-green-500' : 'border-border'
-                    }`}>
-                      {present && <Check size={13} strokeWidth={3} className="text-white" />}
-                    </div>
-                  </button>
+                    <ToggleSwitch
+                      checked={present}
+                      onChange={() => !loading && toggleAttendance(student)}
+                      disabled={loading}
+                    />
+                  </div>
                 )
               })}
-            </div>
+            </Card>
           )}
         </div>
       )}

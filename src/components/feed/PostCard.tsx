@@ -41,12 +41,17 @@ export function PostCard({ post, reactions: initialReactions, comments: initialC
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [animatingEmoji, setAnimatingEmoji] = useState<ReactionEmoji | null>(null)
   const supabase = createClient()
 
   const userReactions = reactions.filter(r => r.user_id === currentUserId).map(r => r.emoji)
 
   async function toggleReaction(emoji: ReactionEmoji) {
     const existing = reactions.find(r => r.user_id === currentUserId && r.emoji === emoji)
+    if (!existing) {
+      setAnimatingEmoji(emoji)
+      setTimeout(() => setAnimatingEmoji(null), 400)
+    }
     if (existing) {
       await supabase.from('post_reactions').delete().eq('id', existing.id)
       setReactions(prev => prev.filter(r => r.id !== existing.id))
@@ -104,11 +109,19 @@ export function PostCard({ post, reactions: initialReactions, comments: initialC
   const typeInfo = POST_TYPE_BADGE[post.post_type] || POST_TYPE_BADGE.general
 
   return (
-    <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+    <div className={`bg-surface border rounded-2xl overflow-hidden ${post.is_pinned ? 'border-pink/30' : 'border-border'}`}>
+      {/* Pinned banner */}
+      {post.is_pinned && (
+        <div className="flex items-center gap-1.5 px-4 pt-3 pb-1">
+          <Pin size={12} className="text-pink" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-pink">Fijado</span>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-pink rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <div className="w-8 h-8 bg-pink rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
             {authorName.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -118,10 +131,7 @@ export function PostCard({ post, reactions: initialReactions, comments: initialC
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {post.is_pinned && <Pin size={14} className="text-pink" />}
-          {typeInfo.label && <Badge variant={typeInfo.variant}>{typeInfo.label}</Badge>}
-        </div>
+        {typeInfo.label && <Badge variant={typeInfo.variant}>{typeInfo.label}</Badge>}
       </div>
 
       {/* Content */}
@@ -151,13 +161,19 @@ export function PostCard({ post, reactions: initialReactions, comments: initialC
             <button
               key={emoji}
               onClick={() => toggleReaction(emoji)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-base transition-all active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-base transition-all duration-150 ${
                 active
                   ? 'bg-pink/20 border border-pink/40 shadow-sm shadow-pink/10'
                   : 'bg-white/5 border border-transparent hover:bg-white/10'
               }`}
             >
-              <span className="leading-none">{emoji}</span>
+              <span
+                className={`leading-none transition-transform duration-300 ${
+                  animatingEmoji === emoji ? 'scale-150' : 'scale-100'
+                }`}
+              >
+                {emoji}
+              </span>
               {count > 0 && (
                 <span className={`text-xs font-medium ${active ? 'text-pink' : 'text-text-muted'}`}>{count}</span>
               )}

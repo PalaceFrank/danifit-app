@@ -11,6 +11,7 @@ type Session = Database['public']['Tables']['schedule_sessions']['Row']
 
 interface SessionCardProps {
   session: Session
+  status?: 'today' | 'upcoming' | 'past'
   isCheckedIn?: boolean
   onCheckIn?: (sessionId: string) => Promise<void>
 }
@@ -29,7 +30,7 @@ const LEVEL_BADGE: Record<string, 'green' | 'yellow' | 'pink' | 'gray'> = {
   all:          'gray',
 }
 
-export function SessionCard({ session, isCheckedIn, onCheckIn }: SessionCardProps) {
+export function SessionCard({ session, status = 'upcoming', isCheckedIn, onCheckIn }: SessionCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const block = TIME_BLOCKS[session.time_block]
@@ -55,29 +56,48 @@ export function SessionCard({ session, isCheckedIn, onCheckIn }: SessionCardProp
     )
   }
 
+  const isToday = status === 'today'
+  const isPast = status === 'past'
+
   return (
-    <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+    <div className={`rounded-2xl overflow-hidden border transition-all duration-200 ${
+      isToday
+        ? 'bg-pink/5 border-pink/40 shadow-[0_0_0_1px_rgba(232,24,90,0.15)]'
+        : isPast
+        ? 'bg-surface border-border opacity-50'
+        : 'bg-surface border-border'
+    }`}>
       <button
         className="w-full text-left p-4"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-medium text-pink">{block.label}</span>
-              {block.start && (
-                <span className="flex items-center gap-1 text-xs text-text-muted">
-                  <Clock size={11} />
-                  {block.start}–{block.end}
+            <div className="flex items-center gap-2 mb-1.5">
+              {isToday && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-pink bg-pink/10 border border-pink/20 px-2 py-0.5 rounded-full">
+                  Hoy
                 </span>
               )}
+              <span className="flex items-center gap-1 text-xs text-text-muted">
+                <Clock size={11} />
+                {block.start}–{block.end}
+              </span>
             </div>
-            <p className="font-semibold text-sm leading-tight">{session.title}</p>
+            <p className={`font-semibold text-sm leading-tight ${isPast ? 'text-text-muted' : ''}`}>
+              {session.title}
+            </p>
+            {session.location && (
+              <p className="flex items-center gap-1 text-xs text-text-muted mt-1">
+                <MapPin size={11} />
+                {session.location}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {session.level && (
               <Badge variant={LEVEL_BADGE[session.level] || 'gray'}>
-                {LEVEL_LABELS[session.level]}
+                {LEVEL_LABELS[session.level as keyof typeof LEVEL_LABELS] ?? session.level}
               </Badge>
             )}
             {expanded ? <ChevronUp size={16} className="text-text-muted" /> : <ChevronDown size={16} className="text-text-muted" />}
@@ -86,23 +106,17 @@ export function SessionCard({ session, isCheckedIn, onCheckIn }: SessionCardProp
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
+        <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
           {session.description && (
             <p className="text-sm text-text-muted leading-relaxed">{session.description}</p>
           )}
 
-          <div className="flex flex-wrap gap-3 text-xs text-text-muted">
-            {session.location && (
-              <span className="flex items-center gap-1">
-                <MapPin size={12} /> {session.location}
-              </span>
-            )}
-            {session.materials && (
-              <span className="flex items-center gap-1">
-                <Users size={12} /> {session.materials}
-              </span>
-            )}
-          </div>
+          {session.materials && (
+            <div className="flex items-center gap-1 text-xs text-text-muted">
+              <Users size={12} />
+              <span>{session.materials}</span>
+            </div>
+          )}
 
           {onCheckIn && (
             <div className="pt-1">
@@ -116,7 +130,7 @@ export function SessionCard({ session, isCheckedIn, onCheckIn }: SessionCardProp
                   size="sm"
                   onClick={handleCheckIn}
                   loading={loading}
-                  className="w-full"
+                  fullWidth
                 >
                   Marcar asistencia
                 </Button>
