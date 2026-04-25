@@ -2,10 +2,11 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Plus, Pin, PinOff, Trash2, Image as ImageIcon, X, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
+import { Plus, Pin, PinOff, Trash2, Image as ImageIcon, X, ChevronDown, ChevronUp, MessageCircle, Rss } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import type { Database, PostType } from '@/types/database'
@@ -17,12 +18,12 @@ type Reaction = any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Comment = any
 
-const POST_TYPES: { value: PostType; label: string }[] = [
-  { value: 'general',      label: 'General' },
-  { value: 'announcement', label: 'Aviso' },
-  { value: 'motivation',   label: 'Motivación' },
-  { value: 'result',       label: 'Resultado' },
-  { value: 'nutrition',    label: 'Nutrición' },
+const POST_TYPES: { value: PostType; label: string; badge: 'gray' | 'pink' | 'yellow' | 'green' }[] = [
+  { value: 'general',      label: 'General',    badge: 'gray' },
+  { value: 'announcement', label: 'Aviso',      badge: 'yellow' },
+  { value: 'motivation',   label: 'Motivación', badge: 'pink' },
+  { value: 'result',       label: 'Resultado',  badge: 'green' },
+  { value: 'nutrition',    label: 'Nutrición',  badge: 'green' },
 ]
 
 interface AdminFeedManagerProps {
@@ -164,14 +165,28 @@ export function AdminFeedManager({ posts: initial, adminId, reactions, comments 
 
       {/* Posts list */}
       <div className="space-y-3">
+        {posts.length === 0 && (
+          <Card padded={false}>
+            <EmptyState
+              icon={Rss}
+              title="Sin publicaciones"
+              description="Crea tu primera publicación para que tus alumnos la vean en el feed."
+            />
+          </Card>
+        )}
         {posts.map(post => (
           <Card key={post.id} padded={false} className="p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
-                <Badge variant={post.post_type === 'announcement' ? 'pink' : 'gray'}>
-                  {POST_TYPES.find(t => t.value === post.post_type)?.label}
-                </Badge>
-                {post.is_pinned && <Pin size={12} className="text-pink" />}
+                {(() => {
+                  const typeInfo = POST_TYPES.find(t => t.value === post.post_type)
+                  return typeInfo?.label ? <Badge variant={typeInfo.badge}>{typeInfo.label}</Badge> : null
+                })()}
+                {post.is_pinned && (
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-pink">
+                    <Pin size={10} /> Fijado
+                  </span>
+                )}
               </div>
               <div className="flex gap-1">
                 <button

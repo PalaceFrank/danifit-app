@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Plus, Clock, UserCheck, Trash2 } from 'lucide-react'
+import { Copy, Check, Plus, Clock, UserCheck, Trash2, Mail } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
@@ -94,7 +95,13 @@ export function InvitationsManager({ invitations: initial, adminId }: Invitation
       {/* List */}
       <div className="space-y-2">
         {invitations.length === 0 && (
-          <p className="text-center text-text-muted text-sm py-8">Sin invitaciones aún</p>
+          <Card padded={false}>
+            <EmptyState
+              icon={Mail}
+              title="Sin invitaciones"
+              description="Genera un link para invitar a tus primeros alumnos."
+            />
+          </Card>
         )}
         {invitations.map(inv => (
           <Card key={inv.id} padded={false} className="p-3">

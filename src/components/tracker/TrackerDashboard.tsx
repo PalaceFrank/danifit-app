@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, TrendingDown, TrendingUp, Minus, Pencil } from 'lucide-react'
+import { Plus, TrendingDown, TrendingUp, Minus, Pencil, Activity } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { NewMeasurementModal } from './NewMeasurementModal'
 import { ProgressChart } from './ProgressChart'
 import { calcBodyFatNavy } from '@/lib/body-calc'
@@ -34,6 +35,7 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
 
   const latest = allMeasurements[allMeasurements.length - 1]
   const previous = allMeasurements[allMeasurements.length - 2]
+  const first = allMeasurements[0]
 
   const currentFat = latest
     ? calcBodyFatNavy({
@@ -45,8 +47,30 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
       })
     : null
 
+  const firstFat = first && first !== latest
+    ? calcBodyFatNavy({
+        sex: bodyProfile.sex!,
+        height_cm: bodyProfile.height_cm!,
+        neck_cm: first.neck_cm!,
+        waist_cm: first.waist_cm!,
+        hip_cm: first.hip_cm ?? undefined,
+      })
+    : null
+
   const weightDelta = latest && previous
     ? +(latest.weight_kg! - previous.weight_kg!).toFixed(1)
+    : null
+
+  const weightDeltaTotal = latest && first && first !== latest
+    ? +(latest.weight_kg! - first.weight_kg!).toFixed(1)
+    : null
+
+  const fatDeltaTotal = currentFat !== null && firstFat !== null
+    ? +(currentFat - firstFat).toFixed(1)
+    : null
+
+  const waistDeltaTotal = latest?.waist_cm && first?.waist_cm && first !== latest
+    ? +(latest.waist_cm - first.waist_cm).toFixed(1)
     : null
 
   function handleNewMeasurement(m: Measurement) {
@@ -86,38 +110,42 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
 
       {/* Stats cards */}
       {latest ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           <StatCard
-            label="Peso actual"
-            value={`${latest.weight_kg} kg`}
-            delta={weightDelta}
-            deltaLabel="vs anterior"
+            label="Peso"
+            value={`${latest.weight_kg}`}
+            unit="kg"
+            delta={weightDeltaTotal}
+            deltaLabel="total"
           />
           <StatCard
             label="% Grasa"
-            value={currentFat ? `${currentFat}%` : '—'}
-            hint={!latest.neck_cm ? 'Agrega medidas de cuello y cintura' : undefined}
+            value={currentFat ? `${currentFat}` : '—'}
+            unit={currentFat ? '%' : ''}
+            delta={fatDeltaTotal}
+            deltaLabel="total"
+            hint={!latest.neck_cm ? 'Agrega cuello y cintura' : undefined}
           />
-          {bodyProfile.target_weight_kg && latest.weight_kg && (
-            <StatCard
-              label="Falta para meta"
-              value={`${Math.abs(+(latest.weight_kg - bodyProfile.target_weight_kg).toFixed(1))} kg`}
-              hint={latest.weight_kg <= bodyProfile.target_weight_kg ? '¡Meta alcanzada! 🎉' : undefined}
-            />
-          )}
-          {latest.waist_cm && (
-            <StatCard label="Cintura" value={`${latest.waist_cm} cm`} />
-          )}
+          <StatCard
+            label="Cintura"
+            value={latest.waist_cm ? `${latest.waist_cm}` : '—'}
+            unit={latest.waist_cm ? 'cm' : ''}
+            delta={waistDeltaTotal}
+            deltaLabel="total"
+          />
         </div>
       ) : (
-        <Card className="text-center py-8 space-y-2">
-          <p className="text-text-muted text-sm">Sin mediciones aún</p>
-          <p className="text-xs text-text-muted">Registra tu primera medición para ver tu progreso</p>
+        <Card padded={false}>
+          <EmptyState
+            icon={Activity}
+            title="Sin mediciones aún"
+            description="Registra tu primera medición para empezar a ver tu progreso."
+          />
         </Card>
       )}
 
       {/* Add button */}
-      <Button onClick={() => setShowModal(true)} className="w-full" size="lg">
+      <Button onClick={() => setShowModal(true)} fullWidth size="lg">
         <Plus size={18} />
         Nueva medición
       </Button>
@@ -188,26 +216,31 @@ export function TrackerDashboard({ bodyProfile, measurements, userId }: TrackerD
 interface StatCardProps {
   label: string
   value: string
+  unit?: string
   delta?: number | null
   deltaLabel?: string
   hint?: string
 }
 
-function StatCard({ label, value, delta, deltaLabel, hint }: StatCardProps) {
-  const DeltaIcon = delta === null || delta === undefined ? null : delta < 0 ? TrendingDown : delta > 0 ? TrendingUp : Minus
-  const deltaColor = delta === null || delta === undefined ? '' : delta < 0 ? 'text-green-400' : delta > 0 ? 'text-red-400' : 'text-text-muted'
+function StatCard({ label, value, unit, delta, deltaLabel, hint }: StatCardProps) {
+  const DeltaIcon = delta == null ? null : delta < 0 ? TrendingDown : delta > 0 ? TrendingUp : Minus
+  // For weight/fat/waist: less is good (green = negative delta)
+  const deltaColor = delta == null ? '' : delta < 0 ? 'text-green-400' : delta > 0 ? 'text-red-400' : 'text-text-muted'
 
   return (
-    <Card padded={false} className="p-4">
-      <p className="text-xs text-text-muted mb-1">{label}</p>
-      <p className="text-xl font-bold">{value}</p>
-      {delta !== null && delta !== undefined && DeltaIcon && (
-        <div className={`flex items-center gap-1 mt-1 text-xs ${deltaColor}`}>
-          <DeltaIcon size={12} />
+    <Card padded={false} className="p-3 flex flex-col gap-1">
+      <p className="text-xs text-text-muted font-medium">{label}</p>
+      <div className="flex items-baseline gap-0.5">
+        <span className="text-2xl font-black leading-none">{value}</span>
+        {unit && <span className="text-xs text-text-muted ml-0.5">{unit}</span>}
+      </div>
+      {delta != null && DeltaIcon && (
+        <div className={`flex items-center gap-0.5 text-xs ${deltaColor}`}>
+          <DeltaIcon size={11} />
           <span>{delta > 0 ? '+' : ''}{delta} {deltaLabel}</span>
         </div>
       )}
-      {hint && <p className="text-xs text-text-muted mt-1">{hint}</p>}
+      {hint && <p className="text-[10px] text-text-muted leading-tight mt-0.5">{hint}</p>}
     </Card>
   )
 }
