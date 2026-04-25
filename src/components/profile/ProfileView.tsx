@@ -8,6 +8,7 @@ import {
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
 import { useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
@@ -171,13 +172,11 @@ export function ProfileView({ profile }: ProfileViewProps) {
                 {pushEnabled ? 'Activadas — recibirás avisos de clases' : 'Desactivadas'}
               </p>
             </div>
-            <button
-              onClick={togglePush}
+            <ToggleSwitch
+              checked={pushEnabled}
+              onChange={togglePush}
               disabled={pushLoading}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${pushEnabled ? 'bg-pink' : 'bg-white/10'}`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${pushEnabled ? 'left-5.5 left-[22px]' : 'left-0.5'}`} />
-            </button>
+            />
           </Card>
         </div>
       </div>
@@ -224,7 +223,7 @@ export function ProfileView({ profile }: ProfileViewProps) {
         variant={confirmLogout ? 'danger' : 'secondary'}
         onClick={handleLogout}
         loading={loggingOut}
-        className="w-full"
+        fullWidth
         size="lg"
       >
         <LogOut size={16} />
