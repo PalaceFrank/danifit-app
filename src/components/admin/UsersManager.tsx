@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { UserCheck, UserX, Search } from 'lucide-react'
+import Link from 'next/link'
+import { UserCheck, UserX, Search, ChevronRight } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -90,16 +91,17 @@ export function UsersManager({ users: initial }: UsersManagerProps) {
         {filtered.map(user => (
           <Card key={user.id} padded={false} className="p-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
+              <Link href={`/admin/users/${user.id}`} className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="w-9 h-9 bg-pink/20 rounded-full flex items-center justify-center text-pink font-bold shrink-0">
                   {user.full_name.charAt(0).toUpperCase()}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">{user.full_name}</p>
                   <p className="text-xs text-text-muted truncate">{user.email}</p>
                   {user.phone && <p className="text-xs text-text-muted">{user.phone}</p>}
                 </div>
-              </div>
+                <ChevronRight size={15} className="text-text-muted shrink-0" />
+              </Link>
               <div className="flex items-center gap-2 shrink-0">
                 <Badge variant={STATUS_BADGE[user.status]}>{STATUS_LABEL[user.status]}</Badge>
                 {user.status === 'pending' && (
@@ -116,7 +118,7 @@ export function UsersManager({ users: initial }: UsersManagerProps) {
                   <Button
                     size="sm"
                     variant="danger"
-                    onClick={() => updateStatus(user.id, 'inactive')}
+                    onClick={e => { e.preventDefault(); updateStatus(user.id, 'inactive') }}
                     loading={loading === user.id}
                   >
                     <UserX size={14} />
@@ -127,7 +129,7 @@ export function UsersManager({ users: initial }: UsersManagerProps) {
                   <Button
                     size="sm"
                     variant="secondary"
-                    onClick={() => updateStatus(user.id, 'active')}
+                    onClick={e => { e.preventDefault(); updateStatus(user.id, 'active') }}
                     loading={loading === user.id}
                   >
                     <UserCheck size={14} />
