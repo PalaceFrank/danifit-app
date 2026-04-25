@@ -50,6 +50,32 @@
 
 ---
 
+## Mejoras UX/UI aplicadas (2026-04-25)
+
+Basadas en especificación generada por Sally (UX agent) en `_bmad-output/planning-artifacts/ux-design-specification.md`.
+
+### Sistema de diseño
+- **tailwind.config.ts**: tokens semánticos (surface-2, border-light, success, warning, error, info, text-subtle), animaciones slide-up y fade-in
+- **Button**: focus ring pink, shadow-pink en primary, `fullWidth` prop, `active:scale-[0.97]`, variante secondary mejorada
+- **Card**: variantes `interactive` (hover scale) y `elevated` (shadow)
+- **Badge**: tipado mejorado, ya tiene variantes green/yellow/red/pink/gray
+
+### Componentes nuevos
+- **EmptyState** (`src/components/ui/EmptyState.tsx`): icon + title + description + CTA action
+- **BottomSheet** (`src/components/ui/BottomSheet.tsx`): slide-up modal mobile, backdrop, handle visual
+- **ToggleSwitch** (`src/components/ui/ToggleSwitch.tsx`): animated toggle con aria-checked
+
+### Vista alumno
+- **Schedule**: SessionCard con estado `today` (borde pink, badge "Hoy"), `past` (opacity-50), ubicación inline, números de día en selector; ScheduleView detecta hora actual para status automático
+- **Feed**: PostCard con banner "📌 Fijado" + borde pink cuando pinnado; badge de tipo semántico; emoji bounce animation al reaccionar; EmptyState con componente
+- **Tracker**: Stats 3 columnas (Peso/% Grasa/Cintura) con delta vs. primera medición; valor + unidad separados; EmptyState cuando no hay medidas
+- **Profile**: ToggleSwitch para push notifications (reemplaza toggle inline roto); fullWidth en logout
+
+### Vista admin
+- **Attendance**: ToggleSwitch por alumno (reemplaza botones); row verde cuando presente; EmptyState para sin sesiones y sin alumnos
+- **Feed**: badge semántico por tipo (general=gray, aviso=yellow, motivación=pink, resultado/nutrición=green); EmptyState para sin posts
+- **Invitations**: EmptyState para sin invitaciones
+
 ## Pendiente / por construir
 
 ### Storage
