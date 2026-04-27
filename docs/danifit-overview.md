@@ -32,10 +32,12 @@ Solo el usuario con rol `admin` puede acceder. Desde aquí el Coach gestiona tod
 - **Perfil** (`/profile`): ve su información, estado de cuenta, activa notificaciones push y cierra sesión.
 
 ### Para el Coach (admin)
-- **Dashboard** (`/admin/dashboard`): resumen de alumnos activos, pendientes de activar, publicaciones e invitaciones pendientes. Accesos rápidos a las secciones principales.
+- **Dashboard** (`/admin/dashboard`): resumen de alumnos activos, pendientes de activar, publicaciones e invitaciones pendientes. Sección de actividad reciente (últimas reacciones y comentarios, 7 días). Accesos rápidos a las secciones principales.
 - **Programa** (`/admin/schedule`): crea, edita y cancela sesiones de entrenamiento para cualquier semana. Cada sesión tiene día, bloque horario, título, descripción, nivel, materiales y ubicación.
+- **Asistencia** (`/admin/attendance`): selecciona sesión por semana y registra asistencia de cada alumno con toggle. Guardado inmediato al hacer clic.
 - **Feed** (`/admin/feed`): redacta y publica posts con tipo (general, aviso, motivación, resultado, nutrición) e imagen opcional. Puede fijar posts destacados, eliminarlos, y ver las reacciones y comentarios de los alumnos por post.
-- **Alumnos** (`/admin/users`): lista todos los alumnos, puede activar o desactivar cuentas (cambio de estado `pending → active → inactive`).
+- **Alumnos** (`/admin/users`): lista todos los alumnos con estado y búsqueda. Puede activar, desactivar o reactivar cuentas. Click en un alumno abre su perfil completo.
+- **Perfil de alumno** (`/admin/users/[id]`): vista de seguimiento para el coach — perfil físico (altura, peso, objetivo, sexo, edad, actividad), stats actuales (peso / % grasa / cintura con delta total desde inicio), gráfico de progreso y historial completo de mediciones con fotos.
 - **Invitaciones** (`/admin/invitations`): genera links de invitación únicos (expiran a 7 días) para que nuevos alumnos se registren. Puede copiar el link y eliminar invitaciones.
 
 ### Sistema de acceso
@@ -54,7 +56,7 @@ Solo el usuario con rol `admin` puede acceder. Desde aquí el Coach gestiona tod
 | Estilos | Tailwind CSS (dark mode, mobile-first) |
 | Base de datos | Supabase (PostgreSQL) |
 | Autenticación | Supabase Auth (PKCE flow) |
-| Storage | Supabase Storage (`post-images`) |
+| Storage | Supabase Storage (`post-images`, `progress-photos`) |
 | Emails | Resend (invitaciones) |
 | Push notifications | Web Push API + VAPID |
 | Deploy | Vercel (auto-deploy desde `main`) |
@@ -69,6 +71,7 @@ Solo el usuario con rol `admin` puede acceder. Desde aquí el Coach gestiona tod
 - `posts` — publicaciones del feed
 - `post_reactions` — reacciones emoji a posts
 - `post_comments` — comentarios en posts
+- `attendance` — asistencia por sesión y alumno
 - `push_subscriptions` — suscripciones push por usuario
 - `notifications` — log de notificaciones enviadas
 
