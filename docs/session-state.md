@@ -1,6 +1,6 @@
 # Estado de sesión — Danifit
 
-Última actualización: 2026-04-24
+Última actualización: 2026-04-26
 
 ---
 
@@ -36,7 +36,8 @@
 ### Vista admin
 - **Dashboard** (`/admin/dashboard`): 4 stats cards (alumnos activos, por activar, publicaciones, invitaciones). Indicador pulsante cuando hay alumnos pendientes. Sección "Actividad reciente" con últimas reacciones y comentarios de los últimos 7 días (máx. 8 items). 4 acciones rápidas.
 - **Feed** (`/admin/feed`): compositor de posts con tipo, texto e imagen. Lista de posts con fijar/desfijar y eliminar. Vista de reacciones por emoji con tooltip de nombres. Comentarios expandibles por post.
-- **Alumnos** (`/admin/users`): lista con nombre, email, estado. Botón para activar/desactivar.
+- **Alumnos** (`/admin/users`): lista con nombre, email, estado. Botón para activar/desactivar. Click en alumno → perfil completo.
+- **Perfil de alumno** (`/admin/users/[id]`): vista de seguimiento del coach — perfil físico completo (altura, peso, objetivo, sexo, edad, actividad), stats actuales (peso / % grasa / cintura con delta total), gráfico de progreso, historial de mediciones con fotos. Botón dar de baja / reactivar inline.
 - **Invitaciones** (`/admin/invitations`): generador de links con nombre opcional. Lista con estado, fecha de expiración, botón copiar y botón eliminar.
 - **Programa** (`/admin/schedule`): gestión de sesiones semanales. Bloques horarios: `morning_a` 08:30, `morning_b` 20:00, `evening_a` 18:00, `evening_b` 19:00, todos de 50 min. Modal sin selector de nivel.
 - **Asistencia** (`/admin/attendance`): selector de sesión por semana. Lista de todos los perfiles activos (cualquier rol). Toggle por alumno con guardado inmediato al hacer clic.
@@ -81,9 +82,6 @@ Basadas en especificación generada por Sally (UX agent) en `_bmad-output/planni
 ### Storage
 - Crear bucket `progress-photos` en Supabase Storage (Public) — necesario para subir fotos en mediciones del tracker
 
-### Admin — alumnos
-- Ver perfil físico de cada alumno desde el panel admin
-
 ### Notificaciones push (infraestructura lista)
 - API route `/api/push/subscribe` existe
 - Falta: envío real de notificaciones desde el panel admin (ej. al publicar un post)
@@ -115,6 +113,11 @@ Basadas en especificación generada por Sally (UX agent) en `_bmad-output/planni
 | `fc40635` | Admin mobile: reemplazar bottom nav con drawer hamburguesa |
 | `a548508` | Fix build: tipos en dashboard activity + ignorar ESLint en Vercel |
 | `a9f831b` | Eliminar TopBar duplicado en páginas de admin |
+| `d9dd869` | Fix text overflow en actividad reciente (truncate en bloque) |
+| `59a462e` | UX overhaul fase 1: EmptyState, BottomSheet, ToggleSwitch, SessionCard estados |
+| `86b7722` | UX overhaul fase 2: tracker stats 3 cols, PostCard pinnado, attendance toggle |
+| `7b44018` | UX overhaul fase 3: ProfileView ToggleSwitch, Button fullWidth |
+| `3d1dd19` | Perfil de alumno para admin: /admin/users/[id] con mediciones y fotos |
 
 ---
 
